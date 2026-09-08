@@ -1,22 +1,14 @@
-# Overtime Calculator v4
+# Overtime Calculator v4.1
 
-This version rebuilds the project save/load workflow.
+Main fix:
+- Inputs now use a Streamlit form.
+- Salary, transportation, exclusions, and period are committed together.
+- This prevents the common data-editor issue where the first click only commits the active cell.
+- Added Apply / Save Inputs button.
+- Calculate Overtime also commits all current inputs before calculating.
+- Download Saved Project uses the latest committed inputs.
 
-Major improvements:
-- Uploading a JSON file no longer changes the app automatically.
-- User must explicitly click Load Project.
-- Period, salary history, transportation history, exclusions, and rules load together.
-- Data editors are rebuilt after loading, avoiding stale Streamlit widget state.
-- Save Project is beside Calculate Overtime.
-- Inputs / Results / How It Works tabs.
-- New / Clear Project command.
-- Excel report export remains available.
-
-To update your existing Streamlit app:
-1. Replace app.py in your GitHub repository with the v4 app.py.
-2. Replace requirements.txt if desired (same dependencies).
-3. Commit the change.
-4. Wait for Streamlit to redeploy.
-5. Refresh your existing app URL.
-
-Your existing saved JSON files from v3 should remain compatible.
+Update:
+1. Replace app.py in GitHub with this app.py.
+2. Commit the change.
+3. Streamlit redeploys automatically.

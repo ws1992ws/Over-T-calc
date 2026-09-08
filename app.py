@@ -795,137 +795,199 @@ input_tab, result_tab, help_tab = st.tabs(
 generation = st.session_state.editor_generation
 
 with input_tab:
-    st.subheader("1. Overtime Period")
-
-    p1, p2 = st.columns(2)
-
-    period_start = p1.date_input(
-        "Start date",
-        value=st.session_state.period_start,
-        key=f"period_start_widget_{generation}",
-    )
-
-    period_end = p2.date_input(
-        "End date",
-        value=st.session_state.period_end,
-        key=f"period_end_widget_{generation}",
-    )
-
-    st.session_state.period_start = period_start
-    st.session_state.period_end = period_end
-
+    st.subheader("Enter Overtime Information")
     st.caption(
-        "Every date in this range is counted as overtime unless it falls inside "
-        "a Vacation or Intedab exclusion."
+        "All fields below are submitted together. This prevents the editable tables "
+        "from losing the first value you enter."
     )
 
-    st.subheader("2. Basic Salary History")
-    st.caption(
-        "Add each salary change with the exact date it became effective. "
-        "The app uses the correct salary separately for each day."
-    )
+    with st.form(
+        key=f"overtime_input_form_{generation}",
+        clear_on_submit=False,
+        border=True,
+    ):
+        st.subheader("1. Overtime Period")
 
-    salary_df = st.data_editor(
-        ensure_columns(st.session_state.salary_data, SALARY_COLUMNS),
-        num_rows="dynamic",
-        hide_index=True,
-        use_container_width=True,
-        key=f"salary_editor_{generation}",
-        column_config={
-            "Effective Date": st.column_config.DateColumn(
-                "Effective Date",
-                format="YYYY-MM-DD",
-                required=True,
-            ),
-            "Basic Salary (SAR)": st.column_config.NumberColumn(
-                "Basic Salary (SAR)",
-                min_value=0.0,
-                step=100.0,
-                format="%.2f",
-                required=True,
-            ),
-        },
-    )
+        p1, p2 = st.columns(2)
 
-    st.session_state.salary_data = ensure_columns(
-        salary_df, SALARY_COLUMNS
-    )
+        period_start_form = p1.date_input(
+            "Start date",
+            value=st.session_state.period_start,
+            key=f"period_start_form_{generation}",
+        )
 
-    st.subheader("3. Transportation Allowance History")
-    st.caption(
-        "Add each transportation allowance change with its exact effective date."
-    )
+        period_end_form = p2.date_input(
+            "End date",
+            value=st.session_state.period_end,
+            key=f"period_end_form_{generation}",
+        )
 
-    transport_df = st.data_editor(
-        ensure_columns(st.session_state.transport_data, TRANSPORT_COLUMNS),
-        num_rows="dynamic",
-        hide_index=True,
-        use_container_width=True,
-        key=f"transport_editor_{generation}",
-        column_config={
-            "Effective Date": st.column_config.DateColumn(
-                "Effective Date",
-                format="YYYY-MM-DD",
-                required=True,
-            ),
-            "Transportation Allowance (SAR)": st.column_config.NumberColumn(
-                "Transportation Allowance (SAR)",
-                min_value=0.0,
-                step=50.0,
-                format="%.2f",
-                required=True,
-            ),
-        },
-    )
+        st.caption(
+            "Every date in this range is counted as overtime unless it falls inside "
+            "a Vacation or Intedab exclusion."
+        )
 
-    st.session_state.transport_data = ensure_columns(
-        transport_df, TRANSPORT_COLUMNS
-    )
+        st.subheader("2. Basic Salary History")
+        st.caption(
+            "Add each salary change with the exact date it became effective."
+        )
 
-    st.subheader("4. Excluded Periods")
-    st.caption(
-        "Add Vacation or Intedab ranges. Public holidays are not excluded automatically."
-    )
+        salary_df_form = st.data_editor(
+            ensure_columns(st.session_state.salary_data, SALARY_COLUMNS),
+            num_rows="dynamic",
+            hide_index=True,
+            use_container_width=True,
+            key=f"salary_editor_form_{generation}",
+            column_config={
+                "Effective Date": st.column_config.DateColumn(
+                    "Effective Date",
+                    format="YYYY-MM-DD",
+                    required=True,
+                ),
+                "Basic Salary (SAR)": st.column_config.NumberColumn(
+                    "Basic Salary (SAR)",
+                    min_value=0.0,
+                    step=100.0,
+                    format="%.2f",
+                    required=True,
+                ),
+            },
+        )
 
-    exclusion_df = st.data_editor(
-        ensure_columns(st.session_state.exclusion_data, EXCLUSION_COLUMNS),
-        num_rows="dynamic",
-        hide_index=True,
-        use_container_width=True,
-        key=f"exclusion_editor_{generation}",
-        column_config={
-            "Type": st.column_config.SelectboxColumn(
-                "Type",
-                options=["Vacation", "Intedab"],
-                required=True,
-            ),
-            "Start Date": st.column_config.DateColumn(
-                "Start Date",
-                format="YYYY-MM-DD",
-                required=True,
-            ),
-            "End Date": st.column_config.DateColumn(
-                "End Date",
-                format="YYYY-MM-DD",
-                required=True,
-            ),
-        },
-    )
+        st.subheader("3. Transportation Allowance History")
+        st.caption(
+            "Add each transportation allowance change with its exact effective date."
+        )
 
-    st.session_state.exclusion_data = ensure_columns(
-        exclusion_df, EXCLUSION_COLUMNS
-    )
+        transport_df_form = st.data_editor(
+            ensure_columns(st.session_state.transport_data, TRANSPORT_COLUMNS),
+            num_rows="dynamic",
+            hide_index=True,
+            use_container_width=True,
+            key=f"transport_editor_form_{generation}",
+            column_config={
+                "Effective Date": st.column_config.DateColumn(
+                    "Effective Date",
+                    format="YYYY-MM-DD",
+                    required=True,
+                ),
+                "Transportation Allowance (SAR)": st.column_config.NumberColumn(
+                    "Transportation Allowance (SAR)",
+                    min_value=0.0,
+                    step=50.0,
+                    format="%.2f",
+                    required=True,
+                ),
+            },
+        )
 
+        st.subheader("4. Excluded Periods")
+        st.caption(
+            "Add Vacation or Intedab ranges. Public holidays are not excluded automatically."
+        )
+
+        exclusion_df_form = st.data_editor(
+            ensure_columns(st.session_state.exclusion_data, EXCLUSION_COLUMNS),
+            num_rows="dynamic",
+            hide_index=True,
+            use_container_width=True,
+            key=f"exclusion_editor_form_{generation}",
+            column_config={
+                "Type": st.column_config.SelectboxColumn(
+                    "Type",
+                    options=["Vacation", "Intedab"],
+                    required=True,
+                ),
+                "Start Date": st.column_config.DateColumn(
+                    "Start Date",
+                    format="YYYY-MM-DD",
+                    required=True,
+                ),
+                "End Date": st.column_config.DateColumn(
+                    "End Date",
+                    format="YYYY-MM-DD",
+                    required=True,
+                ),
+            },
+        )
+
+        st.divider()
+
+        submit1, submit2 = st.columns(2)
+
+        apply_clicked = submit1.form_submit_button(
+            "Apply / Save Inputs",
+            use_container_width=True,
+        )
+
+        calculate_clicked = submit2.form_submit_button(
+            "Calculate Overtime",
+            type="primary",
+            use_container_width=True,
+        )
+
+    # Commit the entire form atomically after either submit button.
+    if apply_clicked or calculate_clicked:
+        st.session_state.period_start = period_start_form
+        st.session_state.period_end = period_end_form
+
+        st.session_state.salary_data = ensure_columns(
+            salary_df_form, SALARY_COLUMNS
+        )
+        st.session_state.transport_data = ensure_columns(
+            transport_df_form, TRANSPORT_COLUMNS
+        )
+        st.session_state.exclusion_data = ensure_columns(
+            exclusion_df_form, EXCLUSION_COLUMNS
+        )
+
+        current_rules = {
+            "weekday_factor": float(st.session_state.weekday_factor),
+            "weekend_factor": float(st.session_state.weekend_factor),
+            "salary_divisor": float(st.session_state.salary_divisor),
+            "transport_divisor": float(st.session_state.transport_divisor),
+        }
+
+        if apply_clicked:
+            st.success("Inputs applied successfully.")
+
+        if calculate_clicked:
+            try:
+                daily_df, monthly_df, summary = calculate_overtime(
+                    st.session_state.period_start,
+                    st.session_state.period_end,
+                    st.session_state.salary_data,
+                    st.session_state.transport_data,
+                    st.session_state.exclusion_data,
+                    current_rules,
+                )
+
+                st.session_state.calc_result = {
+                    "daily_df": daily_df,
+                    "monthly_df": monthly_df,
+                    "summary": summary,
+                    "period_start": st.session_state.period_start,
+                    "period_end": st.session_state.period_end,
+                    "salary_df": st.session_state.salary_data.copy(),
+                    "transport_df": st.session_state.transport_data.copy(),
+                    "exclusion_df": st.session_state.exclusion_data.copy(),
+                    "rules": current_rules.copy(),
+                }
+
+                st.success(
+                    "Calculation completed. Open the Results tab."
+                )
+            except Exception as exc:
+                st.error(str(exc))
+
+    # Project download is intentionally outside the form.
+    # It always uses the latest committed inputs.
     current_rules = {
         "weekday_factor": float(st.session_state.weekday_factor),
         "weekend_factor": float(st.session_state.weekend_factor),
         "salary_divisor": float(st.session_state.salary_divisor),
         "transport_divisor": float(st.session_state.transport_divisor),
     }
-
-    st.divider()
-
-    action1, action2 = st.columns([1, 1])
 
     project_file_bytes = build_project_json(
         st.session_state.period_start,
@@ -936,48 +998,14 @@ with input_tab:
         current_rules,
     )
 
-    action1.download_button(
-        "💾 Save Project",
+    st.download_button(
+        "💾 Download Saved Project",
         data=project_file_bytes,
         file_name="overtime_project.json",
         mime="application/json",
         use_container_width=True,
+        help="Use Apply / Save Inputs first if you changed anything and do not want to calculate yet.",
     )
-
-    calculate_clicked = action2.button(
-        "Calculate Overtime",
-        type="primary",
-        use_container_width=True,
-    )
-
-    if calculate_clicked:
-        try:
-            daily_df, monthly_df, summary = calculate_overtime(
-                st.session_state.period_start,
-                st.session_state.period_end,
-                st.session_state.salary_data,
-                st.session_state.transport_data,
-                st.session_state.exclusion_data,
-                current_rules,
-            )
-
-            st.session_state.calc_result = {
-                "daily_df": daily_df,
-                "monthly_df": monthly_df,
-                "summary": summary,
-                "period_start": st.session_state.period_start,
-                "period_end": st.session_state.period_end,
-                "salary_df": st.session_state.salary_data.copy(),
-                "transport_df": st.session_state.transport_data.copy(),
-                "exclusion_df": st.session_state.exclusion_data.copy(),
-                "rules": current_rules.copy(),
-            }
-
-            st.success(
-                "Calculation completed. Open the Results tab."
-            )
-        except Exception as exc:
-            st.error(str(exc))
 
 with result_tab:
     calculation = st.session_state.calc_result
@@ -1106,8 +1134,8 @@ by its normal calendar day unless you manually add it as an exclusion.
     st.markdown(
         """
 1. Enter or update your information.
-2. Click **Save Project** in the Inputs tab.
-3. Keep the downloaded `.json` file.
+2. Click **Apply / Save Inputs** to commit all entries together, or click **Calculate Overtime**.
+3. Click **Download Saved Project** to save the committed inputs as a `.json` file.
 4. Later, choose that file in the left sidebar.
 5. Click **Load Project**.
 6. The app replaces all current inputs with the saved project in one operation.

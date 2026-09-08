@@ -165,7 +165,10 @@ with st.sidebar:
     if up is not None:
         try:
             data=json.load(up)
-            st.session_state["loaded_period"]=(date.fromisoformat(data["period"]["start"]),date.fromisoformat(data["period"]["end"]))
+            loaded_start = date.fromisoformat(data["period"]["start"])
+            loaded_end = date.fromisoformat(data["period"]["end"])
+            st.session_state["start_v3"] = loaded_start
+            st.session_state["end_v3"] = loaded_end
             st.session_state.salary_data=pd.DataFrame([{"Effective Date":date.fromisoformat(x["effective_date"]),"Basic Salary (SAR)":x["amount"]} for x in data.get("salary_history",[])])
             st.session_state.transport_data=pd.DataFrame([{"Effective Date":date.fromisoformat(x["effective_date"]),"Transportation Allowance (SAR)":x["amount"]} for x in data.get("transport_history",[])])
             loaded_exclusions = [
@@ -180,6 +183,7 @@ with st.sidebar:
             for k,v in data.get("rules",{}).items():
                 if k in DEFAULTS: st.session_state[k]=float(v)
             st.success("Project loaded.")
+            st.rerun()
         except Exception as e:
             st.error(f"Could not load project: {e}")
 
@@ -191,14 +195,13 @@ with st.sidebar:
     td=st.number_input("Transportation divisor",value=float(st.session_state.transport_divisor),step=1.0)
     st.caption("Friday & Saturday are weekends. Public holidays are not automatically excluded.")
 
-loaded=st.session_state.pop("loaded_period",None)
-default_start=loaded[0] if loaded else date(date.today().year,1,1)
-default_end=loaded[1] if loaded else date.today()
+st.session_state.setdefault("start_v3", date(date.today().year,1,1))
+st.session_state.setdefault("end_v3", date.today())
 
 st.subheader("1. Overtime Period")
 c1,c2=st.columns(2)
-start=c1.date_input("Start date",value=default_start,key="start_v3")
-end=c2.date_input("End date",value=default_end,key="end_v3")
+start=c1.date_input("Start date",key="start_v3")
+end=c2.date_input("End date",key="end_v3")
 st.caption("All dates are counted unless excluded as Vacation or Intedab.")
 
 st.subheader("2. Basic Salary History")

@@ -1,12 +1,13 @@
-# Overtime Calculator v3.1
+# Overtime Calculator v3.2
 
-Fix:
-- Correctly loads saved projects that contain no Vacation/Intedab exclusions.
-- Prevents KeyError when the exclusion table is empty.
-- Existing save/load, Excel export, and calculation features remain unchanged.
+Fixes:
+- Saved overtime Start Date now restores correctly.
+- Saved overtime End Date now restores correctly.
+- Empty Vacation/Intedab project files remain supported.
+- Existing Excel export and save/load features remain unchanged.
 
-To update:
-1. Replace app.py in your GitHub repository with this version.
-2. requirements.txt can remain the same, but replacing it is also fine.
-3. Commit the change.
-4. Streamlit should redeploy automatically.
+Update:
+1. Replace app.py in GitHub with the new app.py.
+2. Commit the change.
+3. Streamlit will redeploy automatically.
+4. Upload your existing saved JSON project again.

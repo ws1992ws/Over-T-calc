@@ -21,6 +21,10 @@ st.session_state.setdefault("transport_data", pd.DataFrame({"Effective Date":[da
 st.session_state.setdefault("exclusion_data", pd.DataFrame(columns=["Type","Start Date","End Date"]))
 st.session_state.setdefault("calc_result", None)
 
+# Keep exclusion table schema valid even after loading an older project file.
+if not all(c in st.session_state.exclusion_data.columns for c in ["Type","Start Date","End Date"]):
+    st.session_state.exclusion_data = pd.DataFrame(columns=["Type","Start Date","End Date"])
+
 def hist(df, dc, ac):
     x=df.dropna(subset=[dc,ac]).copy()
     if x.empty: return []
@@ -34,8 +38,10 @@ def effective(h,d):
     return max(a,key=lambda x:x[0])[1] if a else None
 
 def exclusions(df):
-    if df.empty: return []
-    x=df.dropna(subset=["Type","Start Date","End Date"]).copy()
+    required = ["Type","Start Date","End Date"]
+    if df is None or df.empty or not all(c in df.columns for c in required):
+        return []
+    x=df.dropna(subset=required).copy()
     if x.empty: return []
     x["Start Date"]=pd.to_datetime(x["Start Date"]).dt.date
     x["End Date"]=pd.to_datetime(x["End Date"]).dt.date
@@ -142,7 +148,14 @@ def project_bytes(start,end,sdf,tdf,edf,rules):
         "rules":rules,
         "salary_history":[{"effective_date":ds(r["Effective Date"]),"amount":float(r["Basic Salary (SAR)"])} for _,r in sdf.dropna().iterrows()],
         "transport_history":[{"effective_date":ds(r["Effective Date"]),"amount":float(r["Transportation Allowance (SAR)"])} for _,r in tdf.dropna().iterrows()],
-        "exclusions":[{"type":str(r["Type"]),"start":ds(r["Start Date"]),"end":ds(r["End Date"])} for _,r in edf.dropna(subset=["Type","Start Date","End Date"]).iterrows()]
+        "exclusions":[
+            {"type":str(r["Type"]),"start":ds(r["Start Date"]),"end":ds(r["End Date"])}
+            for _,r in (
+                edf.dropna(subset=["Type","Start Date","End Date"])
+                if edf is not None and all(c in edf.columns for c in ["Type","Start Date","End Date"])
+                else pd.DataFrame(columns=["Type","Start Date","End Date"])
+            ).iterrows()
+        ]
     }
     return json.dumps(data,indent=2).encode("utf-8")
 
@@ -155,7 +168,15 @@ with st.sidebar:
             st.session_state["loaded_period"]=(date.fromisoformat(data["period"]["start"]),date.fromisoformat(data["period"]["end"]))
             st.session_state.salary_data=pd.DataFrame([{"Effective Date":date.fromisoformat(x["effective_date"]),"Basic Salary (SAR)":x["amount"]} for x in data.get("salary_history",[])])
             st.session_state.transport_data=pd.DataFrame([{"Effective Date":date.fromisoformat(x["effective_date"]),"Transportation Allowance (SAR)":x["amount"]} for x in data.get("transport_history",[])])
-            st.session_state.exclusion_data=pd.DataFrame([{"Type":x["type"],"Start Date":date.fromisoformat(x["start"]),"End Date":date.fromisoformat(x["end"])} for x in data.get("exclusions",[])])
+            loaded_exclusions = [
+                {"Type":x["type"],"Start Date":date.fromisoformat(x["start"]),"End Date":date.fromisoformat(x["end"])}
+                for x in data.get("exclusions",[])
+            ]
+            st.session_state.exclusion_data = (
+                pd.DataFrame(loaded_exclusions)
+                if loaded_exclusions
+                else pd.DataFrame(columns=["Type","Start Date","End Date"])
+            )
             for k,v in data.get("rules",{}).items():
                 if k in DEFAULTS: st.session_state[k]=float(v)
             st.success("Project loaded.")

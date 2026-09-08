@@ -1,15 +1,12 @@
-# Overtime Calculator v3
+# Overtime Calculator v3.1
 
-New:
-- Improved interface
-- Save/load project data using JSON
-- Excel report export
-- Monthly and daily detail
-- Editable calculation rules
+Fix:
+- Correctly loads saved projects that contain no Vacation/Intedab exclusions.
+- Prevents KeyError when the exclusion table is empty.
+- Existing save/load, Excel export, and calculation features remain unchanged.
 
-Update your existing Streamlit app:
-1. Replace app.py in GitHub with this app.py.
-2. Replace requirements.txt with this requirements.txt.
-3. Commit the changes.
+To update:
+1. Replace app.py in your GitHub repository with this version.
+2. requirements.txt can remain the same, but replacing it is also fine.
+3. Commit the change.
 4. Streamlit should redeploy automatically.
-5. Your existing app URL should stay the same.
